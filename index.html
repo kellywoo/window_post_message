@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="markup; css; javascript" />
+    <meta name="author" content="kelly" />
+    <meta name="description" content="kelly's markup, css, javascript blog" />
+    <meta name="format-detection" content="telephone=no,address=no,email=no" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=2.0"
+    />
+    <meta property="og:title" content="Kelly's Blog" />
+    <meta
+      property="og:description"
+      content="kelly's markup, css, javascript blog"
+    />
+    <title>Kelly's BLOG</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #eee;
+      }
+      #app {
+        padding: 10px;
+      }
+      iframe {
+        margin-top: 10px;
+        display: block;
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        height: 300px;
+      }
+      dl {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        max-width: 500px;
+        height: 50px;
+      }
+      dt {
+        flex: 0 0 auto;
+      }
+      dd {
+        flex: 1 1 auto;
+        text-align: right;
+      }
+      button {
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <dl>
+        <dt>Received:</dt>
+        <dd id="result"></dd>
+      </dl>
+      <dl>
+        <dt>Send(string):</dt>
+        <dd>
+          <button id="btnString">send string</button>
+          <div id="sendString"></div>
+        </dd>
+      </dl>
+      <dl>
+        <dt>Send(Object):</dt>
+        <dd>
+          <button id="btnObject">send object</button>
+          <div id="sendObject"></div>
+        </dd>
+      </dl>
+      <dl>
+        <dt>Send(class):</dt>
+        <dd>
+          <button id="btnClass">send class</button>
+          <div id="sendClass"></div>
+        </dd>
+      </dl>
+      <iframe id="child" src="./2.html"></iframe>
+    </div>
+    <script>
+      function stringify(data){
+        return JSON.stringify(data)
+          .replace(/^"/, "")
+          .replace(/"$/, "");
+      }
+      var iframe = document.getElementById("child");
+      var i = 0;
+
+      class A {
+        constructor(message, key){
+          this.message = message;
+          this.key = key;
+        }
+        hi(){
+          console.log('hi')
+        }
+      }
+
+      window.addEventListener("message", function(e) {
+        var data = stringify(e.data);
+        console.log("<parent> received", data);
+        result.innerHTML = data;
+      });
+
+      document.getElementById("btnString").addEventListener("click", function() {
+        console.log("<parent> send");
+        var data = "hi child" + ++i;
+        iframe.contentWindow.postMessage( data, "*");
+        document.getElementById('sendString').innerHTML = stringify(data);
+      });
+
+      document.getElementById("btnObject").addEventListener("click", function() {
+        console.log("<parent> send");
+        var data = { message: "hi child", key: ++i };
+        iframe.contentWindow.postMessage(data, "*");
+        document.getElementById('sendObject').innerHTML = stringify(data);
+      });
+
+      document.getElementById("btnClass").addEventListener("click", function() {
+        console.log("<parent> send");
+        var data = new A("hi child", ++i );
+        iframe.contentWindow.postMessage(data, "*");
+        document.getElementById('sendClass').innerHTML = stringify(data);
+      });
+
+    </script>
+  </body>
+</html>
